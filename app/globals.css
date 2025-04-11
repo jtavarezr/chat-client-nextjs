@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.5rem;
+  }
+
+  .theme-dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 142.4 71.8% 29.2%;
+  }
+
+  .theme-emerald {
+    --background: 220 20% 10%;
+    --foreground: 0 0% 98%;
+    --card: 220 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 215 25% 18%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 215 25% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 25% 18%;
+    --input: 215 25% 18%;
+    --ring: 160 84% 39%;
+  }
+
+  .theme-purple {
+    --background: 240 20% 10%;
+    --foreground: 0 0% 98%;
+    --card: 240 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 20% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 270 70% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 25% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 25% 18%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 25% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 25% 18%;
+    --input: 240 25% 18%;
+    --ring: 270 70% 60%;
+  }
+
+  .theme-blue {
+    --background: 220 30% 10%;
+    --foreground: 0 0% 98%;
+    --card: 220 30% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 30% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 210 100% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 35% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 35% 18%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 220 35% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 35% 18%;
+    --input: 220 35% 18%;
+    --ring: 210 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--secondary));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.8);
+}
+
+/* Code editor styles */
+.code-editor {
+  font-family: "Fira Code", monospace;
+}
+
+/* Language-specific syntax highlighting */
+.language-javascript .keyword {
+  color: #c678dd;
+}
+.language-javascript .string {
+  color: #98c379;
+}
+.language-javascript .comment {
+  color: #5c6370;
+  font-style: italic;
+}
+.language-javascript .function {
+  color: #61afef;
+}
+.language-javascript .number {
+  color: #d19a66;
+}
+
+.language-python .keyword {
+  color: #c678dd;
+}
+.language-python .string {
+  color: #98c379;
+}
+.language-python .comment {
+  color: #5c6370;
+  font-style: italic;
+}
+.language-python .function {
+  color: #61afef;
+}
+.language-python .number {
+  color: #d19a66;
+}
+
+.language-java .keyword {
+  color: #c678dd;
+}
+.language-java .string {
+  color: #98c379;
+}
+.language-java .comment {
+  color: #5c6370;
+  font-style: italic;
+}
+.language-java .function {
+  color: #61afef;
+}
+.language-java .number {
+  color: #d19a66;
+}
