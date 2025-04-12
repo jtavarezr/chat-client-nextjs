@@ -107,7 +107,7 @@ export function ChatMessage({ message, onThreadClick }: ChatMessageProps) {
     return parts.length > 0 ? parts : [{ type: "text", content }]
   }
 
-  // Mark message as read if it's not from the current user and not read yet
+  // Mark message as read if not from current user and not read
   if (message.from !== currentUser.id && message.status !== "read") {
     markAsRead(message.id)
   }
@@ -122,7 +122,7 @@ export function ChatMessage({ message, onThreadClick }: ChatMessageProps) {
     locale: es,
   })
 
-  // Toggle message actions visibility
+  // Toggle actions visibility
   const toggleActions = () => {
     setShowActions(!showActions)
   }
@@ -147,16 +147,17 @@ export function ChatMessage({ message, onThreadClick }: ChatMessageProps) {
         </div>
 
         <div
-          className={`rounded-lg p-4 ${isUser ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}
+          className={`rounded-lg py-2 px-4 leading-tight text-sm ${
+            isUser ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
+          }`}
         >
           {processFileLinks(message.content).map((part, index) => {
             if (part.type === "text") {
-              // Process regular text for code blocks
               const textParts = processMessageContent(part.content)
               return textParts.map((textPart, textIndex) => {
                 if (textPart.type === "text") {
                   return (
-                    <div key={`${index}-text-${textIndex}`} className="whitespace-pre-wrap mb-2">
+                    <div key={`${index}-text-${textIndex}`} className="whitespace-pre-wrap mb-1">
                       {textPart.content}
                     </div>
                   )
@@ -173,7 +174,7 @@ export function ChatMessage({ message, onThreadClick }: ChatMessageProps) {
               })
             } else if (part.type === "file") {
               return (
-                <div key={`${index}-file`} className="mb-2 flex items-center bg-background/20 p-2 rounded">
+                <div key={`${index}-file`} className="mb-1 flex items-center bg-background/20 p-1 rounded">
                   <a
                     href={part.downloadUrl}
                     download={part.fileName}

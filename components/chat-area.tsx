@@ -1,124 +1,104 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChatInput } from "@/components/chat-input"
-import { ChatMessage } from "@/components/chat-message"
-import { ChatThread } from "@/components/chat-thread"
-import { CodeEditor } from "@/components/code-editor"
-import { GitIntegration } from "@/components/git-integration"
-import { AudioCall } from "@/components/audio-call"
-import { Search, Code, GitBranch, Settings, MessageSquare, Phone, Users } from "lucide-react"
-import { useChat } from "@/components/chat-context"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatMessage } from "@/components/chat-message";
+import { ChatThread } from "@/components/chat-thread";
+import { CodeEditor } from "@/components/code-editor";
+import { GitIntegration } from "@/components/git-integration";
+import { AudioCall } from "@/components/audio-call";
+import { Search, Code, GitBranch, Settings, MessageSquare, Phone, Users } from "lucide-react";
+import { useChat } from "@/components/chat-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChatInput } from "@/components/chat-input";
 
 export function ChatArea() {
-  const [activeTab, setActiveTab] = useState("chat")
-  const [threadView, setThreadView] = useState<string | null>(null)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [inCall, setInCall] = useState(false)
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [activeTab, setActiveTab] = useState("chat");
+  const [threadView, setThreadView] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [inCall, setInCall] = useState(false);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const { currentUser, selectedChat, messages, sendMessage, markAllAsRead, isTyping, setTypingStatus, leaveGroup } =
-    useChat()
+    useChat();
 
-  // Add a ref for the scroll area
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-
-  // Add a function to scroll to bottom
+  // Desplazar al final del chat
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current
-      scrollElement.scrollTop = scrollElement.scrollHeight
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }
+  };
 
-  // Scroll to bottom when messages change
-  // Replace the existing useEffect for scrolling with:
+  // Auto-scroll para mensajes nuevos o al cargar chat
   useEffect(() => {
-    if (activeTab === "chat" && !threadView) {
-      // Only auto-scroll when a new message is added
+    if (activeTab === "chat" && !threadView && scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current;
       const isAtBottom =
-        messagesEndRef.current && messagesEndRef.current.getBoundingClientRect().bottom <= window.innerHeight + 100
+        scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 100;
+      const isOwnMessage = messages.length > 0 && messages[messages.length - 1].from === currentUser.id;
 
-      if (
-        isAtBottom ||
-        messages.length === 0 ||
-        (messages.length > 0 && messages[messages.length - 1].from === currentUser.id)
-      ) {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      if (isAtBottom || isOwnMessage || messages.length === 0) {
+        scrollToBottom();
       }
     }
-  }, [messages, activeTab, threadView, currentUser.id])
+  }, [messages, activeTab, threadView, currentUser.id]);
 
-  // Mark messages as read when viewing chat
+  // Scroll inicial y marcar mensajes como leídos
   useEffect(() => {
     if (selectedChat && activeTab === "chat") {
-      markAllAsRead()
+      scrollToBottom();
+      markAllAsRead();
     }
-  }, [selectedChat, activeTab, markAllAsRead])
+  }, [selectedChat, activeTab, markAllAsRead]);
 
-  // Update the sendMessage function to scroll to bottom after sending
+  // Handlers
   const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (input.trim()) {
-      setIsLoading(true)
-      sendMessage(input)
-      setInput("")
-      setTimeout(() => {
-        setIsLoading(false)
-        scrollToBottom()
-      }, 500)
-    }
-  }
+    e.preventDefault();
+    if (!input.trim()) return;
 
-  // Add an effect to scroll to bottom on initial load
-  useEffect(() => {
-    if (selectedChat) {
-      setTimeout(scrollToBottom, 300)
-    }
-  }, [selectedChat])
+    setIsLoading(true);
+    sendMessage(input);
+    setInput("");
+    setTypingStatus(false);
+    setTimeout(scrollToBottom, 100);
+    setIsLoading(false);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value)
-
-    // Send typing status
-    setTypingStatus(e.target.value.length > 0)
-  }
+    setInput(e.target.value);
+    setTypingStatus(e.target.value.length > 0);
+  };
 
   const handleFileUpload = (file: File) => {
-    // In a real app, you would upload the file to a server
-    // and then send a message with the file URL
-    sendMessage(`[Archivo adjunto: ${file.name}]`)
-  }
+    sendMessage(`[Archivo adjunto: ${file.name}]`);
+    scrollToBottom();
+  };
 
   const handleStartAudioCall = () => {
-    setInCall(true)
-    setActiveTab("call")
-  }
+    setInCall(true);
+    setActiveTab("call");
+  };
 
   const handleEndCall = () => {
-    setInCall(false)
-    setActiveTab("chat")
-  }
+    setInCall(false);
+    setActiveTab("chat");
+  };
 
   const handleLeaveGroup = () => {
-    if (selectedChat && selectedChat.type === "group") {
-      leaveGroup(selectedChat.id)
+    if (selectedChat?.type === "group") {
+      leaveGroup(selectedChat.id);
     }
-  }
+  };
 
-  // Get messages for a specific thread
   const getThreadMessages = (threadId: string) => {
-    return messages.filter((msg) => msg.id === threadId || msg.threadId === threadId)
-  }
+    return messages.filter((msg) => msg.id === threadId || msg.threadId === threadId);
+  };
 
-  // Mock participants for audio call
   const callParticipants = [
     { id: "user-1", name: "You", isSpeaking: false, isMuted: false },
     ...(selectedChat?.type === "direct"
@@ -126,26 +106,26 @@ export function ChatArea() {
       : [
           { id: "user-2", name: "Sarah Chen", isSpeaking: false, isMuted: false },
           { id: "user-3", name: "Alex Johnson", isSpeaking: false, isMuted: true },
-          { id: "user-4", name: "Miguel Rodriguez", isSpeaking: false, isMuted: false },
         ]),
-  ]
+  ];
 
   if (!selectedChat) {
-    return <div className="flex-1 flex items-center justify-center">Selecciona un chat para comenzar</div>
+    return <div className="flex-1 flex items-center justify-center">Selecciona un chat para comenzar</div>;
   }
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-1 border-b border-border">
         <div className="flex items-center">
           {selectedChat.type === "direct" ? (
             <>
-              <Avatar className="h-8 w-8 mr-2">
-                <AvatarImage src={`/placeholder.svg?height=32&width=32`} />
+              <Avatar className="h-6 w-6 mr-2">
+                <AvatarImage src={`/placeholder.svg?height=24&width=24`} />
                 <AvatarFallback className="text-xs">{selectedChat.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-lg font-medium">{selectedChat.name}</h2>
+                <h2 className="text-base font-medium">{selectedChat.name}</h2>
                 <p className="text-xs text-muted-foreground">
                   {selectedChat.status === "online" ? "En línea" : "Desconectado"}
                 </p>
@@ -153,36 +133,37 @@ export function ChatArea() {
             </>
           ) : (
             <>
-              <div className="bg-primary/20 rounded-full p-2 mr-2">
-                <Users className="h-5 w-5 text-primary" />
+              <div className="bg-primary/20 rounded-full p-1 mr-2">
+                <Users className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-medium">{selectedChat.name}</h2>
+                <h2 className="text-base font-medium">{selectedChat.name}</h2>
                 <p className="text-xs text-muted-foreground">{selectedChat.members?.length || 0} miembros</p>
               </div>
             </>
           )}
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
           {!inCall && (
             <Button variant="ghost" size="icon" onClick={handleStartAudioCall}>
-              <Phone className="h-5 w-5" />
+              <Phone className="h-4 w-4" />
             </Button>
           )}
           <Button variant="ghost" size="icon" onClick={() => setSearchOpen(!searchOpen)}>
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4" />
           </Button>
           {selectedChat.type === "group" && (
             <Button variant="ghost" size="icon" onClick={handleLeaveGroup}>
-              <Users className="h-5 w-5" />
+              <Users className="h-4 w-4" />
             </Button>
           )}
           <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
+            <Settings className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
+      {/* Search Bar */}
       {searchOpen && (
         <div className="p-2 bg-secondary border-b border-border">
           <div className="relative">
@@ -195,6 +176,7 @@ export function ChatArea() {
         </div>
       )}
 
+      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
         <TabsList className="px-4 py-2 border-b border-border bg-card">
           <TabsTrigger value="chat" className="data-[state=active]:bg-primary">
@@ -217,22 +199,22 @@ export function ChatArea() {
           )}
         </TabsList>
 
-        <TabsContent value="chat" className="flex-1 flex">
+        {/* Chat Content */}
+        <TabsContent value="chat" className="flex-1 p-0">
           {threadView ? (
             <ChatThread messages={getThreadMessages(threadView)} onClose={() => setThreadView(null)} />
           ) : (
-            <div ref={scrollAreaRef} className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-4">
+            <ScrollArea ref={scrollAreaRef} className="h-[calc(100vh-14rem)] p-4">
+              <div className="space-y-4 pb-12">
                 {selectedChat.type === "group" && (
                   <div className="bg-secondary/50 rounded-lg p-4 mb-4 text-center">
                     <h3 className="font-medium">{selectedChat.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {selectedChat.members?.length || 0} miembros • Creado por{" "}
-                      {selectedChat.creatorId === currentUser.id ? "ti" : "otro usuario"}
+                      {selectedChat.creatorId === currentUser.id ? "tú" : "otro usuario"}
                     </p>
                   </div>
                 )}
-
                 {messages.map((message) => (
                   <ChatMessage
                     key={message.id}
@@ -257,20 +239,30 @@ export function ChatArea() {
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
+            </ScrollArea>
+          )}
+          {activeTab === "chat" && !threadView && (
+            <div className="p-4 pt-0 -mt-6 border-t border-border">
+              <ChatInput
+                value={input}
+                onChange={handleInputChange}
+                onSubmit={handleSendMessage}
+                onFileUpload={handleFileUpload}
+                onStartAudioCall={handleStartAudioCall}
+                isLoading={isLoading}
+              />
             </div>
           )}
         </TabsContent>
 
+        {/* Other Tabs */}
         <TabsContent value="code" className="flex-1 p-0">
           <CodeEditor />
         </TabsContent>
-
         <TabsContent value="git" className="flex-1 p-0">
           <GitIntegration />
         </TabsContent>
-
         <TabsContent value="call" className="flex-1 p-0">
           <AudioCall
             isGroup={selectedChat.type === "group"}
@@ -279,19 +271,6 @@ export function ChatArea() {
           />
         </TabsContent>
       </Tabs>
-
-      {activeTab === "chat" && (
-        <div className="p-4 border-t border-border">
-          <ChatInput
-            value={input}
-            onChange={handleInputChange}
-            onSubmit={handleSendMessage}
-            onFileUpload={handleFileUpload}
-            onStartAudioCall={handleStartAudioCall}
-            isLoading={isLoading}
-          />
-        </div>
-      )}
     </div>
-  )
+  );
 }

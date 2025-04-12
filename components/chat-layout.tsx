@@ -32,13 +32,7 @@ export function ChatLayout() {
       isSpeaking: false,
       isMuted: false,
     },
-    {
-      id: "user2",
-      name: selectedChat?.name || "User",
-      avatar: "/placeholder.svg?height=64&width=64",
-      isSpeaking: false,
-      isMuted: false,
-    },
+
   ]
 
   if (selectedChat?.type === "group") {
@@ -49,13 +43,6 @@ export function ChatLayout() {
         avatar: "/placeholder.svg?height=64&width=64",
         isSpeaking: false,
         isMuted: true,
-      },
-      {
-        id: "user4",
-        name: "Miguel Rodriguez",
-        avatar: "/placeholder.svg?height=64&width=64",
-        isSpeaking: false,
-        isMuted: false,
       },
     )
   }
@@ -98,23 +85,8 @@ export function ChatLayout() {
 
         {!isDesktop && (
           <MobileHeader
-            chatName={selectedChat?.name || "Selecciona un chat"}
             onMenuClick={() => setSidebarOpen(true)}
-            rightElement={
-              <div className="flex items-center space-x-2">
-                {selectedChat && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setCallActive(true)}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Phone className="h-5 w-5" />
-                  </Button>
-                )}
-                <ThemeSwitcher />
-              </div>
-            }
+            
           />
         )}
 
@@ -126,24 +98,7 @@ export function ChatLayout() {
           />
         ) : (
           <div className="flex flex-col flex-1">
-            {isDesktop && (
-              <div className="flex items-center justify-end p-2 border-b border-border bg-card">
-                <div className="flex items-center space-x-2">
-                  {selectedChat && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCallActive(true)}
-                      className="bg-secondary border-input hover:bg-secondary/80"
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      Iniciar Llamada
-                    </Button>
-                  )}
-                  <ThemeSwitcher />
-                </div>
-              </div>
-            )}
+            
             {selectedChat ? (
               <ChatArea />
             ) : (

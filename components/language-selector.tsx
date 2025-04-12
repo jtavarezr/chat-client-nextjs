@@ -14,7 +14,6 @@ interface Language {
 
 const languages: Language[] = [
   { id: "javascript", name: "JavaScript", icon: "js" },
-  { id: "typescript", name: "TypeScript", icon: "ts" },
   { id: "python", name: "Python", icon: "py" },
   { id: "java", name: "Java", icon: "java" },
   { id: "csharp", name: "C#", icon: "cs" },
@@ -30,6 +29,7 @@ const languages: Language[] = [
   { id: "sql", name: "SQL", icon: "sql" },
   { id: "bash", name: "Bash/Shell", icon: "sh" },
   { id: "plaintext", name: "Plain Text", icon: "txt" },
+  { id: "typescript", name: "TypeScript", icon: "ts" },
 ]
 
 interface LanguageSelectorProps {
